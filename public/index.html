@@ -1,0 +1,66 @@
+<html>
+<head>
+    <title>Recipe Manager</title>
+    <style href="styles.css" rel = "style"></style>
+</head>
+<body>
+    <h1>Recipe Manager</h1>
+    <div id="app">
+        <form id="recipe-form">
+            <input type="text" id="title" placeholder="Recipe Title" required /><br>
+            <textarea id="ingredients" placeholder="Ingredients" required></textarea><br>
+            <textarea id="instructions" placeholder="Instructions" required></textarea><br>
+            <button type="submit">Add Recipe</button>
+        </form>
+        <div id="recipe-list"></div>
+    </div>
+    <script>
+        const form = document.getElementById('recipe-form');
+        const recipeList = document.getElementById('recipe-list');
+
+        const API_URL = '/api/recipes';
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const ingredients = document.getElementById('ingredients').value;
+            const instructions = document.getElementById('instructions').value;
+
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, ingredients, instructions })
+            });
+
+            if (response.ok) {
+                form.reset();
+                loadRecipes();
+            }
+        });
+
+        async function loadRecipes() {
+            const response = await fetch(API_URL);
+            const recipes = await response.json();
+            recipeList.innerHTML = '';
+            recipes.forEach(recipe => {
+                const div = document.createElement('div');
+                div.className = 'recipe';
+                div.innerHTML = `
+                    <h2>${recipe.title}</h2>
+                    <p><strong>Ingredients:</strong> ${recipe.ingredients}</p>
+                    <p><strong>Instructions:</strong> ${recipe.instructions}</p>
+                    <button onclick="deleteRecipe('${recipe._id}')">Delete</button>
+                `;
+                recipeList.appendChild(div);
+            });
+        }
+
+        async function deleteRecipe(id) {
+            await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            loadRecipes();
+        }
+
+        loadRecipes();
+    </script>
+</body>
+</html>
