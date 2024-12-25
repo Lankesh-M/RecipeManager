@@ -4,25 +4,25 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
+require('dotenv').config();
+
 
 // Middleware
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 // MongoDB Connection
-mongoose.connect('mongodb+srv://lankeshmeganathan:5h5NOkoLYS9GT4Ti@cluster0.aelci.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', { })
-    .then(() => console.log('MongoDB connected successfully'))
-    .catch(err => console.error('MongoDB connection error:', err));
-    
-    // mongoose.connect('mongodb+srv://lankeshmeganathan:<5h5NOkoLYS9GT4Ti>@cluster0.aelci.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
-    // });
+// console.log(process.env.MONGODB_URI);
+// console.log(process.env.PORT);
+mongoose.connect(process.env.MONGODB_URI,{});
+
+const db = mongoose.connection;
 
 // mongodb+srv://lankeshmeganathan:<db_password>@cluster0.aelci.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-const db = mongoose.connection;
-// db.on('error', console.error.bind(console, 'Connection error:'));
-// db.once('open', () => {
-//     console.log('Connected to MongoDB');
-// });
+db.on('error', console.error.bind(console, 'Connection error:'));
+db.once('open', () => {
+    console.log('Connected to MongoDB');
+});
 
 // Mongoose Schema & Model
 const recipeSchema = new mongoose.Schema({
@@ -34,12 +34,15 @@ const recipeSchema = new mongoose.Schema({
 
 const Recipe = mongoose.model('Recipe', recipeSchema);
 
+
 // Routes
 // Create Recipe
 app.post('/api/recipes', async (req, res) => {
     try {
         const recipe = new Recipe(req.body);
         await recipe.save();
+        console.log(recipe);
+        recipe.createdAt = recipe.createdAt.toDateString();
         res.status(201).json(recipe);
     } catch (err) {
         res.status(400).json({ message: err.message });
