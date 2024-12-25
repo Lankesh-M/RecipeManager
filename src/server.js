@@ -52,7 +52,7 @@ app.post('/api/recipes', async (req, res) => {
 // Read All Recipes
 app.get('/api/recipes', async (req, res) => {
     try {
-        const recipes = await Recipe.find();
+        const recipes = await Recipe.find().limit(20);
         res.json(recipes);
     } catch (err) {
         res.status(500).json({ message: err.message });
