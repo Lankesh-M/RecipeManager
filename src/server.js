@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 // MongoDB Connection
 // console.log(process.env.MONGODB_URI);
 // console.log(process.env.PORT);
-mongoose.connect(process.env.MONGODB_URI,{});
+mongoose.connect("mongodb+srv://lankeshmeganathan:5h5NOkoLYS9GT4Ti@cluster0.aelci.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",{});
 
 const db = mongoose.connection;
 
